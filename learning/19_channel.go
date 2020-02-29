@@ -69,6 +69,7 @@ func selectChannel() {
             return
         default:
             log.Println("...")
+            // log.Println(<-queue)
             time.Sleep(time.Second)
         }
     }
