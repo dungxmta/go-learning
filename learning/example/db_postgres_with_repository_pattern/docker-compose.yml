@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  db_postgres:
+    image: postgres:latest
+    container_name: db_postgres
+    restart: always
+    volumes:
+      - './postgres:/var/lib/postgresql/data/'
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: database
+    ports:
+      - '5432:5432'
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+# docker exec -it db_postgres bash
+# psql --host=database --username=admin --dbname=database
