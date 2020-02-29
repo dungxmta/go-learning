@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 )
 
 // pass func's params with context
 func main() {
+	log.Println("begin main...")
 	ctx := context.WithValue(context.Background(), "key1", "val1")
 	First(ctx)
-	fmt.Println("end main!")
+	log.Println("end main!")
 }
 
 func First(ctx context.Context) {
@@ -23,5 +24,5 @@ func Second(ctx context.Context) {
 	v1 := ctx.Value("key1")
 	v2 := ctx.Value("key2")
 
-	fmt.Println(v1, " | ", v2)
+	log.Println(v1, " | ", v2)
 }

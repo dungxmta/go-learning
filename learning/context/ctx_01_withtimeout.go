@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -16,6 +16,7 @@ type Context interface {
 */
 
 func main() {
+	log.Println("begin main...")
 	// main end after 5s
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 
@@ -25,7 +26,7 @@ func main() {
 	// WithTimeout_02(ctx)
 	// WithTimeout_03(ctx, cancel)
 	WithTimeout_04(ctx, cancel)
-	fmt.Println("end main!")
+	log.Println("end main!")
 }
 
 // wait 5s
@@ -33,9 +34,9 @@ func WithTimeout_01(ctx context.Context) {
 	// ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
 	select {
 	case <-ctx.Done():
-		fmt.Println(ctx.Err())
+		log.Println(ctx.Err())
 	}
-	fmt.Println("end WithTimeout_01()")
+	log.Println("end WithTimeout_01()")
 }
 
 func WithTimeout_02(ctx context.Context) {
@@ -43,12 +44,12 @@ func WithTimeout_02(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println(ctx.Err())
-			fmt.Println("end WithTimeout_02()")
+			log.Println(ctx.Err())
+			log.Println("end WithTimeout_02()")
 			return
 		default:
 			time.Sleep(time.Second * 1)
-			fmt.Println("...")
+			log.Println("...")
 		}
 	}
 }
@@ -67,12 +68,12 @@ func WithTimeout_03(ctx context.Context, cancelFunc context.CancelFunc) {
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println(ctx.Err())
-			fmt.Println("end WithTimeout_03()")
+			log.Println(ctx.Err())
+			log.Println("end WithTimeout_03()")
 			return
 		default:
 			time.Sleep(time.Second * 1)
-			fmt.Println("...")
+			log.Println("...")
 		}
 	}
 }
@@ -83,7 +84,7 @@ func WithTimeout_04(ctx context.Context, cancelFunc context.CancelFunc) {
 	go func() {
 		select {
 		case <-ctx.Done():
-			fmt.Println(ctx.Err())
+			log.Println(ctx.Err())
 			canceled <- true
 		}
 	}()
@@ -92,12 +93,12 @@ func WithTimeout_04(ctx context.Context, cancelFunc context.CancelFunc) {
 		close(canceled)
 
 		defer func() {
-			fmt.Println("end WithTimeout_04() after cancel signal")
+			log.Println("end WithTimeout_04() after cancel signal")
 		}()
 
 		return
 	}
 
 	time.Sleep(time.Second * 10)
-	fmt.Println("end WithTimeout_04() after 10s")
+	log.Println("end WithTimeout_04() after 10s")
 }
