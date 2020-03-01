@@ -1,0 +1,4 @@
+{
+  "MONGO_URI": "mongodb://localhost:27018/go_learning",
+  "MONGO_DBNAME": "go_learning"
+}
