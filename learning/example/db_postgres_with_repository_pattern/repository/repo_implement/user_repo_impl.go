@@ -59,3 +59,16 @@ func (u *UserRepoImpl) Insert(user models.User) error {
 	fmt.Println("Inserted user")
 	return nil
 }
+
+func (u *UserRepoImpl) Exists(key, value string) bool {
+	query := fmt.Sprintf("SELECT EXISTS(SELECT * FROM users WHERE %s='%s');", key, value)
+
+	var exists bool
+	err := u.Db.QueryRow(query).Scan(&exists)
+
+	if err != nil {
+		return false
+	}
+
+	return exists
+}

@@ -30,7 +30,7 @@ func main() {
 
 	userRepo := repo_impl.NewUserRepo(db.SQL)
 
-	// addUsers(userRepo)
+	addUsers(userRepo)
 	getUsers(userRepo)
 }
 
@@ -59,6 +59,12 @@ func addUsers(userRepo repo.UserRepo) {
 	}
 
 	for idx, u := range dataUsers {
+		userExisted := userRepo.Exists("email", u.Email)
+		if userExisted {
+			fmt.Println("User already existed! Ignore...")
+			continue
+		}
+
 		err := userRepo.Insert(u)
 		if err != nil {
 			fmt.Println("Err when insert user", idx, " | ", err)

@@ -8,4 +8,5 @@ type UserRepo interface {
 	// Select() ([]*models.User, error)
 	Select() ([]models.User, error)
 	Insert(u models.User) error
+	Exists(key, value string) bool
 }
