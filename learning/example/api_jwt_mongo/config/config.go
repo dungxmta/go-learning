@@ -9,7 +9,7 @@ import (
 func init() {
 	// name of config file (without extension)
 	viper.SetConfigName("config")
-	viper.SetConfigType("yml")
+	viper.SetConfigType("json")
 
 	// call multiple times to add many search paths
 	// optionally look for config in the working directory
