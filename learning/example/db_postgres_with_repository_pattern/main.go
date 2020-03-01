@@ -9,11 +9,12 @@ import (
 )
 
 const (
-	host     = "localhost"
-	port     = "5432"
-	user     = "admin"
-	password = "123456"
-	dbname   = "database"
+	driverName = "postgres"
+	host       = "localhost"
+	port       = "5432"
+	user       = "admin"
+	password   = "123456"
+	dbname     = "database"
 )
 
 func main() {
