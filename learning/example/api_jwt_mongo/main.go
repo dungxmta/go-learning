@@ -27,12 +27,8 @@ func main() {
 }
 
 func userLogin(userRepo repo.UserRepo) {
-	queryData := map[string]interface{}{
-		"email":    "admin@gmail.com",
-		"password": "12",
-	}
 
-	user, err := userRepo.FindOne(queryData)
+	user, err := userRepo.CheckLogin("admin@gmail.com", "1")
 	if err != nil {
 		fmt.Println("Email or Password wrong!")
 		return
