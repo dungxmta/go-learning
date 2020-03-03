@@ -6,16 +6,31 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"sync"
 	"time"
 )
 
-type MongoDB struct {
+type MongoConnector struct {
 	Client *mongo.Client
 }
 
-var Mongo = &MongoDB{}
+// https://medium.com/golang-issue/how-singleton-pattern-works-with-golang-2fdd61cd5a7f
+// var singletonMongo = &MongoDB{}
+var singletonMongo *MongoConnector
+var once sync.Once
 
-func ConnectMongoDB(uri string) *MongoDB {
+func GetInstance() *MongoConnector {
+	// if singletonMongo == nil {
+	once.Do(func() {
+		singletonMongo = &MongoConnector{}
+	})
+	return singletonMongo
+}
+
+func ConnectMongoDB(uri string) *MongoConnector {
+	if singletonMongo == nil {
+		GetInstance()
+	}
 	// new client
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
@@ -37,6 +52,6 @@ func ConnectMongoDB(uri string) *MongoDB {
 
 	fmt.Println("connect db ok!")
 
-	Mongo.Client = client
-	return Mongo
+	singletonMongo.Client = client
+	return singletonMongo
 }
