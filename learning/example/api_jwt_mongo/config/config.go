@@ -16,6 +16,7 @@ func init() {
 	// viper.AddConfigPath("$HOME/.appname")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("./config")
+	viper.AddConfigPath("./../../config")
 
 	// Find and read the config file
 	err := viper.ReadInConfig()
@@ -32,4 +33,8 @@ func init() {
 
 func GetStr(key string) string {
 	return viper.GetString(key)
+}
+
+func Get(key string) interface{} {
+	return viper.Get(key)
 }

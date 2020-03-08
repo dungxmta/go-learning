@@ -1,4 +1,10 @@
 {
   "MONGO_URI": "mongodb://localhost:27018/go_learning",
-  "MONGO_DBNAME": "go_learning"
+  "MONGO_DBNAME": "go_learning",
+
+  "REDIS_ADDR": "localhost:6379",
+  "REDIS_DB": 1,
+  "REDIS_PWD": "",
+
+  "REST_APP": "localhost:8090"
 }
