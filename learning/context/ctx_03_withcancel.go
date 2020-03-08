@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// main end khi nha duoc signal cancel
+// main end khi nhan duoc signal cancel
 func main() {
 	log.Println("begin main...")
 	ctx, cancel := context.WithCancel(context.Background())
