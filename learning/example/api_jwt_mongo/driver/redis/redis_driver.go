@@ -42,3 +42,19 @@ func Connect(addr, password string, db int) *RedisConnector {
 	singletonRedis.Client = client
 	return singletonRedis
 }
+
+/**
+error return from redis when action get nothing
+i.e.
+	val2, err := client.Get("key2").Result()
+	if err == redis.Nil {
+		fmt.Println("key2 does not exist")
+	} else if err != nil {
+		panic(err)
+	} else {
+		fmt.Println("key2", val2)
+	}
+*/
+func ErrNotFound(err error) bool {
+	return err == redis.Nil
+}

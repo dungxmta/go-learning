@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	// "log"
+	"log"
 	"testProject/learning/example/api_jwt_mongo/config"
 	driverRedis "testProject/learning/example/api_jwt_mongo/driver/redis"
 	"time"
@@ -29,11 +29,13 @@ func main() {
 	pluginMap := make(map[string]Job)
 
 	for {
-		pluginConf, _ := redis.Client.RPop(QUEUE).Result()
-		// TODO: "redis: nil" ???
-		// if err.Error() != "redis: nil" {
-		// 	fmt.Println(err)
-		// }
+		pluginConf, err := redis.Client.RPop(QUEUE).Result()
+		if driverRedis.ErrNotFound(err) {
+			// "redis: nil"
+			// fmt.Println(err)
+		} else if err != nil {
+			log.Fatal(err)
+		}
 
 		if pluginConf == "" {
 			fmt.Println("...main...")
