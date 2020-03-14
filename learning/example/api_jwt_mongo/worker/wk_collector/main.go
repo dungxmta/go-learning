@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 	"testProject/learning/example/api_jwt_mongo/config"
 	driverRedis "testProject/learning/example/api_jwt_mongo/driver/redis"
 	"time"
@@ -43,18 +44,38 @@ func main() {
 			continue
 		}
 
+		// TODO: check data here (hardcoded "plugin_id" with prefix "stop_")
+		// stop plugin when get action from queue data
+		if strings.HasPrefix(pluginConf, "stop_") {
+			id := fmt.Sprintf("plugin_%v", strings.TrimPrefix(pluginConf, "stop_"))
+
+			_, exists := pluginMap[id]
+			if exists {
+				pluginMap[id].Stop()
+				delete(pluginMap, id)
+			} else {
+				fmt.Println("...main...", id, "not exists!")
+			}
+			continue
+		}
+
 		// TODO: check config type here
 		// plugin per goroutine
-		id := fmt.Sprintf("plugin_%v", count)
-		fmt.Println(id, " | ", pluginConf)
+		id := fmt.Sprintf("plugin_%v", pluginConf)
 
-		plugin := NewPlugin(id, pluginConf)
-
-		go plugin.Process()
-
-		time.AfterFunc(time.Second*5, func() {
+		// if plugin is running somehow then try to stop it first
+		_, exists := pluginMap[id]
+		if exists {
 			pluginMap[id].Stop()
-		})
+			delete(pluginMap, id)
+		}
+
+		fmt.Println("...main... Init", id, "[", count, "]")
+		fakePluginConf := fmt.Sprintf("%v", count)
+
+		// init new plugin then put it to map
+		plugin := NewPlugin(id, fakePluginConf)
+		go plugin.Process()
 
 		pluginMap[id] = plugin
 
@@ -82,32 +103,38 @@ func NewPlugin(id string, conf string) *Plugin {
 }
 
 func (p *Plugin) Process() {
-	defer fmt.Println("-> End", p.id)
-	fmt.Println("-> Start", p.id)
-	fmt.Println("...running ", p.id, "with config", p.conf)
+	defer fmt.Println("... -> END", p.id, "[", p.conf, "]")
+	fmt.Println("... -> Start running", p.id, "[", p.conf, "]")
 
-	timeout := time.After(23 * time.Hour)
+	timeout := time.After(5 * time.Minute)
 	// TODO: logic here
-	// for i := 0; i < 20; i++ {
 	for {
 		select {
 		case <-p.stop: // wait stop/done signal
-			fmt.Println("+ Plugin", p.id, "get Stop signal!")
+			fmt.Println("... <-", p.id, "[", p.conf, "]", "get STOP signal! Quit after 5s...")
+			time.Sleep(time.Second * 5)
 			return
 		case <-timeout:
-			fmt.Println("out of time :(")
+			fmt.Println("... out of time :(")
 		default:
 			// TODO: logic here
 			time.Sleep(time.Second)
-			fmt.Println("... <-", p.id)
+			fmt.Println("... <-", p.id, "[", p.conf, "]")
 		}
 	}
 }
 
 func (p *Plugin) Stop() {
-	defer fmt.Println("Done stopping", p.id)
-	fmt.Println("... stopping", p.id)
-	p.stop <- true
+	defer fmt.Println("...main... Done send stopping", p.id, "[", p.conf, "]")
+	fmt.Println("...main... Try stopping", p.id, "[", p.conf, "]")
+
+	// close stop channel
+	close(p.stop)
+	// p.stop <- true
+	// fmt.Println("... stopping 2", p.id)
+	// p.stop <- true
+	// fmt.Println("... stopping 3", p.id)
+	// p.stop <- true
 }
 
 // func (p *Plugin) Process() {
