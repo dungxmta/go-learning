@@ -2,6 +2,8 @@
 // goroutine:   each worker read word from file and put it to words channel
 // main:        get value from counter channel then calculate it
 // ===========================================
+// === >>> TOO SLOW event worse than test_00 with NO goroutine!!!
+// ===========================================
 package main
 
 import (
@@ -11,8 +13,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	// print map like table
-	// "github.com/landoop/tableprinter"
 )
 
 type Job interface {
@@ -91,16 +91,20 @@ func NewWordsCounter() *WordsCounter {
 
 // var wg sync.WaitGroup
 
+var files = []string{
+	"file_1.txt",
+	"file_2.txt",
+	"file_3.txt",
+	"file_4.txt",
+	"file_5.txt",
+	"file_6.txt",
+	"file_7.txt",
+}
+
 func main() {
 	wordsChannel := make(chan string)
 	// wordsCounter := make(map[string]int)
 	wordsCounter := NewWordsCounter()
-
-	files := []string{
-		"file_1.txt",
-		"file_2.txt",
-		"file_3.txt",
-	}
 
 	// wg.Add(len(files) + 1)
 	// wkMap := make(map[string]context.Context)
@@ -118,9 +122,10 @@ func main() {
 			defer func() {
 				// wk.done = true
 				wk.Done()
-				log.Println("Done", wk.GetID())
+				log.Println("Done <-", wk.GetID())
 			}()
 
+			log.Println("Start ->", wk.GetID())
 			err := wk.Process(wordsChannel)
 			if err != nil {
 				log.Fatal("Error when process data from file", srcFile, err)
@@ -165,11 +170,8 @@ func main() {
 	}
 	// }(wordsCounter)
 ALL_WORKER_DONE:
-	// wg.Wait()
-	log.Println("Done!\n")
-	// printer := tableprinter.New(os.Stdout)
-	// printer.Print(&wordsCounter.found)
-	for k, v := range wordsCounter.found {
-		fmt.Printf("%20s : %3v\n", k, v)
-	}
+	log.Println("Done!", len(wordsCounter.found))
+	// for k, v := range wordsCounter.found {
+	// 	fmt.Printf("%20s : %3v\n", k, v)
+	// }
 }
