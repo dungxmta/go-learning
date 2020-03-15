@@ -1,0 +1,13 @@
+The key to testable code in Go is using interfaces.
+When I started to write production Go
+code about 9 months ago,
+ I was given that exact piece of advice and well,
+  it was less than enlightening.
+   It was not immediately obvious how interfaces solve this problem.
+    My first attempts worked fine,
+    but required writing a lot of needless code implementing
+     other people’s interfaces for test stubbing.
+     It took me awhile to realize how to properly
+     leverage Go’s powerful interface mechanism.
+This is what I learned and it has drastically
+improved the testability of my Go code.

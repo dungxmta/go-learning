@@ -1,0 +1,10 @@
+If you are coming from Ruby
+ or another dynamic language you are used
+ to mocking and stubbing extensively for testing.
+ This works fabulously well in Ruby,
+  for example, where you can easily modify a class or object at
+  runtime when testing it. Because Go is strongly typed
+  and statically compiled, mocking and stubbing is harder
+  to achieve and far less flexible. You can do it to an
+  extent, but you’re really working against the grain of the language.
+ But that doesn’t mean that you can’t test your code just as well.

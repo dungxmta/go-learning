@@ -1,0 +1,25 @@
+Dependency Injection
+You really must be injecting all of your dependencies.
+
+Dependency injection is good coding practice in most languages,
+ but in dynamic languages you can get away with
+  isolating dependencies with runtime magic and with stubbing
+   in your test code.
+    In Go you need to always inject your dependencies since you can’t
+     (mostly) patch things at runtime in a safe way.
+
+Here’s some sample Go code showing the injection of a dependency.
+ Let’s say we need to be able to get some JSON data
+ from the web and then do something with it.
+  In the real code I want to get this from the web
+   with an HTTP request, but in testing,
+   I want to test my logic not whether I can make an HTTP request.
+    To remove the dependency from my code,
+    I pass in an HttpResponseFetcher that knows how to get
+     things from the web.
+
+Yes, there are libraries that let you handle HTTP testing
+ without doing this, but this is an example that
+  I think is easy to understand. And in many ways this is better,
+   more flexible code. Here we’ll require in a dependency in
+   the method signature.
