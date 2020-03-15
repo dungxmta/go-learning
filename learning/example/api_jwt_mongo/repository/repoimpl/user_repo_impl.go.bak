@@ -1,11 +1,5 @@
 package repoimpl
 
-/**
-NOTE: implement repo should only contain wrap to mongo, no business logic here
-
-i.e: Insert() -> NO logic check exists or hashed password here; move it to handler
-*/
-
 import (
 	"context"
 	"errors"
@@ -80,16 +74,27 @@ func (ins *UserRepoImpl) FindOne(queryData map[string]interface{}) (models.User,
 	return user, nil
 }
 
-// TODO: refactor code like Insert(): move logic code to handler!!!
-
 func (ins *UserRepoImpl) Insert(u *models.User) (string, error) {
-	// encode data
-	bbytes, err := bson.Marshal(u)
+	// check duplicate
+	// var query = make(map[string]interface{})
+	queryExists := map[string]interface{}{
+		"email": u.Email,
+	}
+	_, found := ins.FindOne(queryExists)
+	if found == nil {
+		return "", errors.New("user existed")
+	}
+
+	// hash password
+	hashPwd, err := utils.HashedPwd(u.Password)
 	if err != nil {
 		return "", err
 	}
+	u.Password = hashPwd
 
-	// insert db
+	// encode data
+	bbytes, _ := bson.Marshal(u)
+
 	result, err := ins.Db.Collection(colName).InsertOne(context.Background(), bbytes)
 	if err != nil {
 		return "", err

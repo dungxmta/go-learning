@@ -1,11 +1,18 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"log"
 	models "testProject/learning/example/api_jwt_mongo/model"
 	repo "testProject/learning/example/api_jwt_mongo/repository"
+	"testProject/pkg/utils"
 )
+
+/**
+NOTE: business logic here! not in "repo implement"
+*/
 
 func UserLogin(userRepo repo.UserRepo) {
 
@@ -32,16 +39,16 @@ func FindUser(userRepo repo.UserRepo) {
 	fmt.Println(user)
 }
 
-func AddUser(userRepo repo.UserRepo) {
+func AddUser(userRepo repo.UserRepo) error {
 	dataUsers := []models.User{
-		models.User{
+		{
 			ID:       primitive.NewObjectID().Hex(),
 			Name:     "admin",
 			Email:    "admin@gmail.com",
 			Role:     "admin",
 			Password: "1",
 		},
-		models.User{
+		{
 			ID:       primitive.NewObjectID().Hex(),
 			Name:     "user1",
 			Email:    "user1@gmail.com",
@@ -51,9 +58,28 @@ func AddUser(userRepo repo.UserRepo) {
 	}
 
 	for idx, u := range dataUsers {
-		_, err := userRepo.Insert(&u)
+		// check duplicate
+		// var query = make(map[string]interface{})
+		queryExists := map[string]interface{}{
+			"email": u.Email,
+		}
+		_, found := userRepo.FindOne(queryExists)
+		if found == nil {
+			return errors.New(fmt.Sprintf("user '%v' existed!", u.Name))
+		}
+
+		// hash password
+		hashPwd, err := utils.HashedPwd(u.Password)
 		if err != nil {
-			fmt.Println("Err when insert user", idx, " | ", err)
+			return (err)
+		}
+		u.Password = hashPwd
+
+		_, err = userRepo.Insert(&u)
+		if err != nil {
+			log.Fatal("Err when insert user", idx, " | ", err)
+			return err
 		}
 	}
+	return nil
 }

@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">testProject/learning/example/api_jwt_mongo/handler/user_handler.go (42.3%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package handler
+
+import (
+        "errors"
+        "fmt"
+        "go.mongodb.org/mongo-driver/bson/primitive"
+        "log"
+        models "testProject/learning/example/api_jwt_mongo/model"
+        repo "testProject/learning/example/api_jwt_mongo/repository"
+        "testProject/pkg/utils"
+)
+
+/**
+NOTE: business logic here! not in "repo implement"
+ */
+
+
+func UserLogin(userRepo repo.UserRepo) <span class="cov0" title="0">{
+
+        user, err := userRepo.CheckLogin("admin@gmail.com", "1")
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Email or Password wrong!")
+                return
+        }</span>
+
+        <span class="cov0" title="0">fmt.Println(user)</span>
+}
+
+func FindUser(userRepo repo.UserRepo) <span class="cov0" title="0">{
+        queryData := map[string]interface{}{
+                "email": "admin@gmail.com",
+        }
+
+        user, err := userRepo.FindOne(queryData)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("User not found!", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">fmt.Println(user)</span>
+}
+
+func AddUser(userRepo repo.UserRepo) error <span class="cov8" title="1">{
+        dataUsers := []models.User{
+                {
+                        ID:       primitive.NewObjectID().Hex(),
+                        Name:     "admin",
+                        Email:    "admin@gmail.com",
+                        Role:     "admin",
+                        Password: "1",
+                },
+                {
+                        ID:       primitive.NewObjectID().Hex(),
+                        Name:     "user1",
+                        Email:    "user1@gmail.com",
+                        Role:     "user",
+                        Password: "1",
+                },
+        }
+
+        for idx, u := range dataUsers </span><span class="cov8" title="1">{
+                // check duplicate
+                // var query = make(map[string]interface{})
+                queryExists := map[string]interface{}{
+                        "email": u.Email,
+                }
+                _, found := userRepo.FindOne(queryExists)
+                if found == nil </span><span class="cov8" title="1">{
+                        return errors.New(fmt.Sprintf("user '%v' existed!", u.Name))
+                }</span>
+
+                // hash password
+                <span class="cov8" title="1">hashPwd, err := utils.HashedPwd(u.Password)
+                if err != nil </span><span class="cov0" title="0">{
+                        return(err)
+                }</span>
+                <span class="cov8" title="1">u.Password = hashPwd
+
+                _, err = userRepo.Insert(&amp;u)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Fatal("Err when insert user", idx, " | ", err)
+                        return err
+                }</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
