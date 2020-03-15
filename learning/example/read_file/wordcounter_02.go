@@ -1,6 +1,9 @@
 // === test 02: use shared variable between goroutine  ===
 // ===========================================
 // === >>> best: using sync.Mutex to lock share variable between goroutine
+// ...
+// in this case, each goroutine had modify shared var; if not using sync.Mutex to lock, we'll face data races
+// ...
 // ===========================================
 package main
 
