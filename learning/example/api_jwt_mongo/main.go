@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
+	driverMongo "testProject/learning/example/api_jwt_mongo/driver/mongo"
+	// "testProject/learning/example/api_jwt_mongo/extensions"
+
 	apiHandler "testProject/learning/example/api_jwt_mongo/handler"
 	models "testProject/learning/example/api_jwt_mongo/model"
 
 	// "go.mongodb.org/mongo-driver/bson/primitive"
 	"testProject/learning/example/api_jwt_mongo/config"
-	driverMongo "testProject/learning/example/api_jwt_mongo/driver/mongo"
-
-	repoImpl "testProject/learning/example/api_jwt_mongo/repository/repoimpl"
+	// repoImpl "testProject/learning/example/api_jwt_mongo/repository/repoimpl"
 )
 
 func main() {
@@ -21,53 +22,67 @@ func main() {
 
 	fmt.Println(mongoUri)
 
-	mongo := driverMongo.ConnectMongoDB(mongoUri)
+	driverMongo.GetInstance().Init(mongoUri)
+	driverMongo.GetInstance().SetDB(mongoDBName)
 
-	userRepo := repoImpl.NewUserRepo(mongo.Client.Database(mongoDBName))
-	comRepo := repoImpl.NewCommonRepo(mongo.Client.Database(mongoDBName))
+	// userRepo := driverMongo.GetInstance().GetUserRI()
+	// userRepo := extensions.UserRepo
+	// ext := extensions.NewExt()
+	// ext := extensions.GetInstance()
+	// // userRepo := ext.UserRepo
+	// userRepo := ext.UserRepo
+	// fmt.Println(userRepo)
+	// err := apiHandler.Demo(userRepo)
+	err := apiHandler.Demo()
+	fmt.Println(err)
+	/*
+		mongo := driverMongo.ConnectMongoDB(mongoUri)
 
-	// apiHandler.AddUser(userRepo)
-	// apiHandler.FindUser(userRepo)
-	apiHandler.UserLogin(userRepo)
+		userRepo := repoImpl.NewUserRepo(mongo.Client.Database(mongoDBName))
+		comRepo := repoImpl.NewCommonRepo(mongo.Client.Database(mongoDBName))
 
-	queryData := map[string]interface{}{
-		"email": "admin@gmail.com",
-	}
+		// apiHandler.AddUser(userRepo)
+		// apiHandler.FindUser(userRepo)
+		apiHandler.UserLogin(userRepo)
 
-	user, err := comRepo.FindOne("users", queryData)
-	if err != nil {
-		fmt.Println("User not found!", err)
-		return
-	}
+		queryData := map[string]interface{}{
+			"email": "admin@gmail.com",
+		}
 
-	// not work
-	f, ok := user.(*models.User)
-	fmt.Println(f, ok)
+		user, err := comRepo.FindOne("users", queryData)
+		if err != nil {
+			fmt.Println("User not found!", err)
+			return
+		}
 
-	// convert map to json/bson first then decode back to struct
-	jsonData, err := bson.Marshal(user)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var u models.User
-	err = bson.Unmarshal(jsonData, &u)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(u)
-	fmt.Println(u.Role)
+		// not work
+		f, ok := user.(*models.User)
+		fmt.Println(f, ok)
 
-	users, err := comRepo.FindAll("users", map[string]interface{}{})
-	if err != nil {
-		fmt.Println("User not found!", err)
-		return
-	}
+		// convert map to json/bson first then decode back to struct
+		jsonData, err := bson.Marshal(user)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var u models.User
+		err = bson.Unmarshal(jsonData, &u)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(u)
+		fmt.Println(u.Role)
 
-	fmt.Println(users)
-	for _, d := range users {
-		fmt.Println(map2user(d))
-	}
+		users, err := comRepo.FindAll("users", map[string]interface{}{})
+		if err != nil {
+			fmt.Println("User not found!", err)
+			return
+		}
 
+		fmt.Println(users)
+		for _, d := range users {
+			fmt.Println(map2user(d))
+		}
+	*/
 }
 
 func map2user(mapData interface{}) models.User {
