@@ -1,10 +1,13 @@
 package driver
 
+import "context"
+
 type Storage interface {
-	Init(string) error
+	Init(string) (Storage, error)
 	SetDB(string)
 
-	Find()
+	Find(colName string, ctx context.Context, results interface{}, filter interface{}, opts ...*interface{}) error
+	FindOne(colName string, ctx context.Context, result interface{}, filter interface{}, opts ...*interface{}) error
 }
 
 type MsgQueue interface {

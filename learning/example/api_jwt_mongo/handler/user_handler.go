@@ -1,19 +1,25 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
-	driverMongo "testProject/learning/example/api_jwt_mongo/driver/mongo"
+	"reflect"
+	storage "testProject/learning/example/api_jwt_mongo/driver/mongo"
 	models "testProject/learning/example/api_jwt_mongo/model"
 	repo "testProject/learning/example/api_jwt_mongo/repository"
 	"testProject/pkg/utils"
+	"time"
 )
 
 /**
 NOTE: business logic here! not in "repo implement"
 */
+
+const colName = "users"
 
 func UserLogin(userRepo repo.UserRepo) {
 
@@ -85,10 +91,11 @@ func AddUser(userRepo repo.UserRepo) error {
 	return nil
 }
 
+/*
 // func Demo(userRepo repo.UserRepo) error {
 func Demo() error {
 	// userRepo := extensions.GetInstance().UserRepo
-	userRepo := driverMongo.GetInstance().GetUserRI()
+	userRepo := storage.GetInstance().GetUserRI()
 	fmt.Println(userRepo)
 
 	dataUsers := []models.User{
@@ -137,4 +144,35 @@ func Demo() error {
 	}
 
 	return nil
+}
+*/
+
+func Demo() error {
+	var one models.User
+	var all []models.User
+
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*60)
+
+	err := storage.GetInstance().FindOne(colName, ctx, &one, bson.M{}, nil)
+	if err != nil {
+		return err
+	}
+	fmt.Println("one", one)
+	fmt.Println("one type", reflect.TypeOf(one))
+
+	err = storage.GetInstance().Find(colName, ctx, &all, bson.M{}, nil)
+	if err != nil {
+		return err
+	}
+	fmt.Println("all", all)
+	fmt.Println("all type", reflect.TypeOf(all))
+
+	/*err := storage.GetInstance().FindTest(colName, ctx, bson.M{}, one, all)
+	if err != nil {
+		return err
+	}
+	fmt.Println("all", all)
+	fmt.Println("all type", reflect.TypeOf(all))
+
+	return nil*/
 }

@@ -6,7 +6,7 @@ import (
 	"testProject/learning/example/api_jwt_mongo/driver"
 )
 
-type RedisConnector struct {
+type connector struct {
 	Client *redis.Client
 }
 
@@ -16,12 +16,12 @@ var once sync.Once
 
 func GetInstance() driver.MsgQueue {
 	once.Do(func() {
-		singleton = &RedisConnector{}
+		singleton = &connector{}
 	})
 	return singleton
 }
 
-func (ins *RedisConnector) Init(addr, password string, db int) (driver.MsgQueue, error) {
+func (ins *connector) Init(addr, password string, db int) (driver.MsgQueue, error) {
 	ins.Client = redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: password,

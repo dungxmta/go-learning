@@ -20,7 +20,7 @@ func NewClient(addr, password string, db int) (driver.MsgQueue, error) {
 		return nil, err
 	}
 
-	return &RedisConnector{Client: client}, nil
+	return &connector{Client: client}, nil
 }
 
 /**
@@ -40,14 +40,14 @@ func ErrNotFound(err error) bool {
 }
 
 // implement redis action
-func (ins *RedisConnector) LPush(key string, values ...interface{}) (int64, error) {
+func (ins *connector) LPush(key string, values ...interface{}) (int64, error) {
 	return ins.Client.LPush(key, values).Result()
 }
 
-func (ins *RedisConnector) RPop(key string) (string, error) {
+func (ins *connector) RPop(key string) (string, error) {
 	return ins.Client.RPop(key).Result()
 }
 
-func (ins *RedisConnector) HGet(key string, field string) (string, error) {
+func (ins *connector) HGet(key string, field string) (string, error) {
 	return ins.Client.HGet(key, field).Result()
 }

@@ -22,8 +22,11 @@ func main() {
 
 	fmt.Println(mongoUri)
 
-	driverMongo.GetInstance().Init(mongoUri)
-	driverMongo.GetInstance().SetDB(mongoDBName)
+	storage, err := driverMongo.GetInstance().Init(mongoUri)
+	if err != nil {
+		panic(err)
+	}
+	storage.SetDB(mongoDBName)
 
 	// userRepo := driverMongo.GetInstance().GetUserRI()
 	// userRepo := extensions.UserRepo
@@ -33,7 +36,7 @@ func main() {
 	// userRepo := ext.UserRepo
 	// fmt.Println(userRepo)
 	// err := apiHandler.Demo(userRepo)
-	err := apiHandler.Demo()
+	err = apiHandler.Demo()
 	fmt.Println(err)
 	/*
 		mongo := driverMongo.ConnectMongoDB(mongoUri)
