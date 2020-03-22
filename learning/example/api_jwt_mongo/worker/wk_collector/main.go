@@ -23,16 +23,19 @@ func main() {
 
 	fmt.Println(redisAddr)
 
-	redis := driverRedis.Connect(redisAddr, redisPwd, redisDB)
+	msgQueue, err := driverRedis.GetInstance().Init(redisAddr, redisPwd, redisDB)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	count := 1
 	// map table with plugin name & instance
 	pluginMap := make(map[string]Job)
 
 	for {
-		pluginConf, err := redis.Client.RPop(QUEUE).Result()
+		pluginConf, err := msgQueue.RPop(QUEUE)
 		if driverRedis.ErrNotFound(err) {
-			// "redis: nil"
+			// "msgQueue: nil"
 			// fmt.Println(err)
 		} else if err != nil {
 			log.Fatal(err)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"log"
 	"net/http"
 	"testProject/learning/example/api_jwt_mongo/config"
 	// driverMongo "testProject/learning/example/api_jwt_mongo/driver/mongo"
@@ -22,8 +23,11 @@ func main() {
 
 	fmt.Println(redisAddr)
 
-	redis := driverRedis.Connect(redisAddr, redisPwd, redisDB)
-	fmt.Println(redis)
+	msgQueue, err := driverRedis.GetInstance().Init(redisAddr, redisPwd, redisDB)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(msgQueue)
 
 	e := echo.New()
 
@@ -42,12 +46,12 @@ func test(c echo.Context) error {
 
 func push(c echo.Context) error {
 	data := c.Param("data")
-	redis := driverRedis.GetInstance()
 
 	c.Logger().Info("data:", data)
 
-	result := redis.Client.LPush(QUEUE, data)
-	if err := result.Err(); err != nil {
+	_, err := driverRedis.GetInstance().LPush(QUEUE, data)
+	// if err := result.Err(); err != nil {
+	if err != nil {
 		c.Logger().Error(err)
 	}
 	return c.String(http.StatusOK, data)
