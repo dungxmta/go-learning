@@ -3,9 +3,11 @@ package log
 /* example
 
 conf := log.Config{
-	FileOut:      "info.log",
-	Level:        log.INFO,
-	FormatJson:   false,
+	FileOut:            "info.log",
+	Level:              log.INFO,
+	FormatJson:         false,
+	DisableLogFile:     false,
+	DisableConsoleLog:  true,
 }
 logger, _ := log.GetInstance().Init(conf)
 
@@ -23,6 +25,7 @@ loggerWithFields.Info("This log will have 2 common fields")
 
 import (
 	"github.com/sirupsen/logrus"
+	"io"
 	"os"
 	"sync"
 )
@@ -58,35 +61,57 @@ func (ins *logger) Init(conf Config) (LoggerWrap, error) {
 	// new logger
 	client := logrus.New()
 
+	writers := make([]io.Writer, 0)
+
 	// set output file
-	var confToFile bool
-	if conf.FileOut != "" {
-		fpath, _ := createFile(conf.FileOut)
-		file, err := os.OpenFile(fpath, os.O_CREATE|os.O_WRONLY, 0666)
+	if !conf.DisableLogFile && conf.FileOut != "" {
+		fPath, _ := createFile(conf.FileOut)
+		// file
+		_, err := os.OpenFile(fPath, os.O_CREATE|os.O_WRONLY, 0666)
 		if err == nil {
-			client.Out = file
-			confToFile = true
+			// client.Out = file
+			// setup rotate
+			logRotate := NewLogRotate(fPath, &conf.Rotate)
+			writers = append(writers, logRotate)
 		} else {
 			client.Warn("Failed to log to file, using default stdout")
 		}
 	}
 
-	// Fallback to IOWriter if confToFile fail
-	if !confToFile {
-		// Output to stdout instead of the default stderr
-		// Can be any io.Writer
-		if conf.IOWriter != nil {
-			client.SetOutput(conf.IOWriter)
-		} else {
-			client.SetOutput(os.Stdout)
-		}
+	// more writer?
+	if conf.IOWriter != nil {
+		writers = append(writers, conf.IOWriter)
+	}
+
+	// default disable console log
+	if !conf.DisableConsoleLog {
+		writers = append(writers, os.Stdout)
 	}
 
 	// set Level
 	if conf.Level != nil {
 		client.SetLevel(conf.Level.(logrus.Level))
 	} else {
-		client.SetLevel(logrus.WarnLevel)
+		client.SetLevel(WARN)
+	}
+
+	// enable only Stdout if env ENV_ASSET_TESTING is on
+	envTesting := os.Getenv(EnvAssetTesting)
+
+	// Output default stdout
+	if len(writers) == 0 || envTesting != "" {
+		client.SetOutput(os.Stdout)
+
+		if envTesting != "" {
+			client.SetLevel(DEBUG)
+			client.WithField("TESTING", "on").Warn("Disable log to file for testing")
+		}
+	} else if len(writers) == 1 {
+		// check 1 for highlight in tty (if log Stdout)
+		client.SetOutput(writers[0])
+	} else {
+		mWriter := io.MultiWriter(writers...)
+		client.SetOutput(mWriter)
 	}
 
 	// Add the calling method as a field

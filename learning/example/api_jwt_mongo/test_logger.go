@@ -12,17 +12,25 @@ func main() {
 	conf := log.Config{
 		FileOut: "info.log",
 		Level:   log.INFO,
-		// FormatJson:    true,
-		// DisableCaller: false,
+		// FormatJson:         true,
+		// DisableCaller:      true,
 		// ShowCallerFullPath: true,
-		// IOWriter:      nil,
+		// DisableLogFile:     true,
+		// DisableConsoleLog:  true,
+		Rotate: log.ConfigRotate{
+			MaxSize:    1,
+			MaxBackups: 10,
+			MaxDays:    7,
+			Compress:   false,
+			LocalTime:  false,
+		},
 	}
 	loggerIns, _ := log.GetInstance().Init(conf)
 
 	runtime.GOMAXPROCS(2)
 
 	maxNum := 1
-	maxSub := 1
+	maxSub := 10
 
 	wg.Add(maxNum)
 
@@ -36,9 +44,10 @@ func main() {
 					"no":        j,
 				})
 
+				// time.Sleep(time.Second)
 				logger.Info("1")
-				logger.Warn("2")
-				logger.Error("3")
+				// logger.Warn("2")
+				// logger.Error("3")
 			}
 		}(i)
 	}

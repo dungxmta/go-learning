@@ -15,15 +15,37 @@ const (
 	PANIC = logrus.PanicLevel
 )
 
-const timeFormat = "02-01-2006 15:04:05"
+const timeFormat = "02-01-2006 15:04:05.000"
+
+const (
+	rotateMaxSize = 50 // megabytes
+	rotateBackups = 10
+	rotateDays    = 7
+)
+
+const EnvAssetTesting = "ENV_ASSET_TESTING"
 
 type Config struct {
-	FileOut            string      // File path; default: stdout
-	Level              interface{} // default: WARN
-	FormatJson         bool        // Log as JSON; default: ASCII formatter
-	DisableCaller      bool        // Add the calling method as a field; default: always
-	ShowCallerFullPath bool        // Show method called with full path; default: only file name
-	IOWriter           io.Writer
+	FileOut    string      // File path; default: stdout
+	Level      interface{} // default: WARN
+	FormatJson bool        // Log as JSON; default: ASCII formatter
+
+	DisableCaller      bool // Add the calling method as a field; default: always
+	ShowCallerFullPath bool // Show method called with full path; default: only file name
+
+	DisableLogFile    bool
+	DisableConsoleLog bool      // os.Stdout
+	IOWriter          io.Writer // add more writer; default os.Stdout & FileLog
+
+	Rotate ConfigRotate
+}
+
+type ConfigRotate struct {
+	MaxSize    int
+	MaxBackups int
+	MaxDays    int
+	Compress   bool
+	LocalTime  bool
 }
 
 type Fields logrus.Fields
