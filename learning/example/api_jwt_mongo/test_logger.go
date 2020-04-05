@@ -10,13 +10,14 @@ func main() {
 	var wg sync.WaitGroup
 
 	conf := log.Config{
-		FileOut: "info.log",
+		FileOut: "logs/info.log",
 		Level:   log.INFO,
 		// FormatJson:         true,
 		// DisableCaller:      true,
 		// ShowCallerFullPath: true,
 		// DisableLogFile:     true,
 		// DisableConsoleLog:  true,
+		// DisableRotate:  true,
 		Rotate: log.ConfigRotate{
 			MaxSize:    1,
 			MaxBackups: 10,
