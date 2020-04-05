@@ -37,7 +37,8 @@ type Config struct {
 	DisableConsoleLog bool      // os.Stdout
 	IOWriter          io.Writer // add more writer; default os.Stdout & FileLog
 
-	Rotate ConfigRotate
+	DisableRotate bool
+	Rotate        ConfigRotate
 }
 
 type ConfigRotate struct {

@@ -7,7 +7,8 @@ conf := log.Config{
 	Level:              log.INFO,
 	FormatJson:         false,
 	DisableLogFile:     false,
-	DisableConsoleLog:  true,
+	DisableConsoleLog:  false,
+	DisableRotate:      false,
 }
 logger, _ := log.GetInstance().Init(conf)
 
@@ -65,16 +66,30 @@ func (ins *logger) Init(conf Config) (LoggerWrap, error) {
 
 	// set output file
 	if !conf.DisableLogFile && conf.FileOut != "" {
-		fPath, _ := createFile(conf.FileOut)
-		// file
-		_, err := os.OpenFile(fPath, os.O_CREATE|os.O_WRONLY, 0666)
-		if err == nil {
-			// client.Out = file
-			// setup rotate
-			logRotate := NewLogRotate(fPath, &conf.Rotate)
-			writers = append(writers, logRotate)
+		fPath, err := createFile(conf.FileOut)
+		if err != nil {
+			client.WithFields(logrus.Fields{
+				"path":  fPath,
+				"error": err,
+			}).Error("Failed to create logs folder")
 		} else {
-			client.Warn("Failed to log to file, using default stdout")
+			file, err := os.OpenFile(fPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+			if err == nil {
+				if conf.DisableRotate {
+					// client.Out = file
+					writers = append(writers, file)
+				} else {
+					// setup rotate
+					logRotate := NewLogRotate(fPath, &conf.Rotate)
+					writers = append(writers, logRotate)
+				}
+				client.WithField("path", fPath).Info("Config log to file ok")
+			} else {
+				client.WithFields(logrus.Fields{
+					"path":  fPath,
+					"error": err,
+				}).Error("Failed to open log file, using default stdout")
+			}
 		}
 	}
 
