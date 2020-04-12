@@ -3,15 +3,18 @@ module testProject
 go 1.13
 
 require (
-	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-redis/redis/v7 v7.2.0
+	github.com/googollee/go-socket.io v1.4.3 // indirect
+	github.com/gorilla/mux v1.7.4 // indirect
+	github.com/gorilla/websocket v1.4.2
 	github.com/kataras/tablewriter v0.0.0-20180708051242-e063d29b7c23 // indirect
 	github.com/labstack/echo/v4 v4.1.15
 	github.com/landoop/tableprinter v0.0.0-20200104100433-ae9249991eb1 // indirect
 	github.com/lib/pq v1.3.0
 	github.com/magiconair/properties v1.8.1
 	github.com/mattn/go-runewidth v0.0.8 // indirect
+	github.com/rs/cors v1.7.0 // indirect
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/objx v0.2.0 // indirect
