@@ -3,6 +3,7 @@ package operation
 import (
 	"fmt"
 	"github.com/qntfy/kazaam/transform"
+	"log"
 	"testProject/learning/example/json_parser/transform/function"
 	"testProject/learning/example/json_parser/transform/helper"
 )
@@ -70,6 +71,12 @@ func FuncExtract(spec *transform.Config, data []byte) ([]byte, error) {
 				dataForV, err = function.ApplyFunc(fnName, fnArgs, dataForV)
 				if err != nil {
 					return nil, err
+				}
+			} else { // default apply check null FUNC if data is array[string]
+				dataForV, err = function.ApplyFunc(function.EmptyStr, nil, dataForV)
+				// keep running even this failed
+				if err != nil {
+					log.Println(err)
 				}
 			}
 

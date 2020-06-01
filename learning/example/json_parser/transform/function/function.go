@@ -1,6 +1,11 @@
 package function
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
+
+const EmptyStr = "SKIP_EMPTY_STR"
 
 func ApplyFunc(name string, args []interface{}, data []byte) ([]byte, error) {
 	// params, err := helper.ParseParams(args)
@@ -14,6 +19,15 @@ func ApplyFunc(name string, args []interface{}, data []byte) ([]byte, error) {
 	switch name {
 	case "DEMO":
 		out, err = Demo(data, args...)
+	case "SKIP_EMPTY_STR":
+		out, err = SkipEmpty(data)
+	default:
+		err = fmt.Errorf("invalid func %v", name)
+	}
+
+	// return raw data here with error
+	if err != nil {
+		return data, err
 	}
 
 	var bbytes []byte
