@@ -104,6 +104,8 @@ func TestParse(t *testing.T) {
 		"1a",
 		"1.2.3aa",
 		"1.2ba.3a",
+		"1.2b.3a ok",
+		"1.2b.3a-not",
 		"1ca.2b.3a",
 		"1c.2b.3a.4d.5ff",
 		"1c.2b.3a.4d.5f.6g",
