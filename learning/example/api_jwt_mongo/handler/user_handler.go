@@ -76,7 +76,7 @@ func AddUser(userRepo repo.UserRepo) error {
 		}
 
 		// hash password
-		hashPwd, err := utils.HashedPwd(u.Password)
+		hashPwd, err := utils.HashPwd(u.Password)
 		if err != nil {
 			return (err)
 		}
@@ -130,7 +130,7 @@ func Demo() error {
 		}
 
 		// hash password
-		hashPwd, err := utils.HashedPwd(u.Password)
+		hashPwd, err := utils.HashPwd(u.Password)
 		if err != nil {
 			return err
 		}
