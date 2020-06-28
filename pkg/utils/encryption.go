@@ -15,6 +15,12 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"golang.org/x/crypto/scrypt"
+)
+
+const (
+	keyLen  = 32 // bytes
+	saltLen = 32
 )
 
 // *** NOTE: secret_key ***
@@ -22,9 +28,29 @@ import (
 // should be the AES key,
 // either 16, 24, or 32 bytes to select AES-128, AES-192, or AES-256.
 func GenerateKey() ([]byte, error) {
-	key := make([]byte, 32)
+	key := make([]byte, saltLen)
 	_, err := rand.Read(key)
 	return key, err
+}
+
+// make a new key 32 bytes based on given "secretKey" + salt for crypto
+func KeyWithSalt(secretKey, salt []byte) ([]byte, []byte, error) {
+	if salt == nil {
+		var err error
+
+		salt, err = GenerateKey()
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	// r * p < 2^30
+	key, err := scrypt.Key(secretKey, salt, 32768, 8, 1, keyLen)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return key, salt, nil
 }
 
 //
@@ -65,6 +91,13 @@ func DecryptHex(key, hexEncrypted string) (string, error) {
 //
 // @return something like []byte("ZÆ.��e�^mΣ���t�")
 func Encrypt(key, data []byte) ([]byte, error) {
+
+	// prepare key with new salt
+	key, salt, err := KeyWithSalt(key, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	// initializing the block cipher based on the key using Advanced Encryption Standard
 	blockCipher, err := aes.NewCipher(key)
 	if err != nil {
@@ -93,6 +126,76 @@ func Encrypt(key, data []byte) ([]byte, error) {
 	//  prepended "nonce" to "data" -> nonce+data
 	ciphertext := gcm.Seal(nonce, nonce, data, nil)
 
+	// append "salt" to encrypted data -> nonce+data+salt
+	ciphertext = append(ciphertext, salt...)
+
+	return ciphertext, nil
+}
+
+func Decrypt(key, data []byte) ([]byte, error) {
+
+	// split "salt" from "data" <- nonce+data+salt
+	dataLen := len(data)
+	if dataLen < saltLen {
+		return nil, errors.New("invalid data")
+	}
+	salt, data := data[dataLen-saltLen:], data[:dataLen-saltLen]
+
+	// prepare key with given salt
+	key, _, err := KeyWithSalt(key, salt)
+	if err != nil {
+		return nil, err
+	}
+
+	// new cipher
+	blockCipher, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	gcm, err := cipher.NewGCM(blockCipher)
+	if err != nil {
+		return nil, err
+	}
+
+	// split "nonce" from "data" <- nonce+data
+	if len(data) < gcm.NonceSize() {
+		return nil, errors.New("invalid data")
+	}
+	nonce, ciphertext := data[:gcm.NonceSize()], data[gcm.NonceSize():]
+
+	// using GCM to decrypting
+	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return plaintext, nil
+}
+
+/*
+
+// old code without salt
+// need to gen key with GenerateKey function, not user given key
+
+func Encrypt(key, data []byte) ([]byte, error) {
+	blockCipher, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	gcm, err := cipher.NewGCM(blockCipher)
+	if err != nil {
+		return nil, err
+	}
+
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err = rand.Read(nonce); err != nil {
+		return nil, err
+	}
+
+	ciphertext := gcm.Seal(nonce, nonce, data, nil)
+
 	return ciphertext, nil
 }
 
@@ -107,14 +210,11 @@ func Decrypt(key, data []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	// split "nonce" and "data" <- nonce+data
 	if len(data) < gcm.NonceSize() {
 		return nil, errors.New("invalid data")
 	}
 	nonce, ciphertext := data[:gcm.NonceSize()], data[gcm.NonceSize():]
-	// nonce[0] = 1
 
-	// using GCM to decrypting
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
 		return nil, err
@@ -122,3 +222,4 @@ func Decrypt(key, data []byte) ([]byte, error) {
 
 	return plaintext, nil
 }
+*/

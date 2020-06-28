@@ -6,9 +6,7 @@ import (
 	"testing"
 )
 
-// should be the AES key,
-// either 16, 24, or 32 bytes to select AES-128, AES-192, or AES-256.
-const secretKeyTest = "super_secret_key"
+const secretKeyTest = "super_secret_key_any_abc"
 
 func TestGenerateKey(t *testing.T) {
 	k, err := GenerateKey()
@@ -20,7 +18,7 @@ func TestGenerateKey(t *testing.T) {
 	t.Log(err)
 }
 
-func TestEncrypt(t *testing.T) {
+func TestEncrypt_Bytes(t *testing.T) {
 	raw := "!@# chuỗi tiếng việt à nha $%^"
 	rawByte := []byte(raw)
 	// t.Log(rawByte)
@@ -30,7 +28,7 @@ func TestEncrypt(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// t.Log(ciphertext)
+	t.Log(ciphertext)
 	t.Log(string(ciphertext))
 
 	// encrypted to string
