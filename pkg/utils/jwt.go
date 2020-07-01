@@ -60,7 +60,7 @@ func (idx TimeUnit) FromNow(duration time.Duration) (int64, error) {
 	case Week:
 		return time.Now().Add(time.Hour * 24 * 7 * duration).Unix(), nil
 	case Month:
-		return time.Now().Add(time.Hour * 24 * 7 * 30 * duration).Unix(), nil
+		return time.Now().Add(time.Hour * 24 * 30 * duration).Unix(), nil
 	case Year:
 		return time.Now().Add(time.Hour * 24 * 365 * duration).Unix(), nil
 	default:
@@ -75,10 +75,10 @@ type ClaimsApiKey struct {
 	jwt.StandardClaims
 }
 
-func (m ClaimsApiKey) Valid() error {
-	// TODO: do validate here, e.g. check perm, scope, ...
-	return nil
-}
+// func (m ClaimsApiKey) Valid() error {
+// 	// TODO: do validate here, e.g. check perm, scope, ...
+// 	return nil
+// }
 
 type ClaimsPortal struct {
 	UserId    string      `json:"user_id"`
