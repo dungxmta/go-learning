@@ -3,6 +3,7 @@ module testProject
 go 1.13
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-redis/redis/v7 v7.2.0
 	github.com/gofrs/uuid v3.3.0+incompatible // indirect
