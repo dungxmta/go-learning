@@ -1,8 +1,9 @@
 package redis
 
 import (
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis"
 	"testProject/learning/example/api_jwt_mongo/driver"
+	"time"
 )
 
 // return new redis client -> this is diff from GetInstance() singleton
@@ -50,4 +51,8 @@ func (ins *connector) RPop(key string) (string, error) {
 
 func (ins *connector) HGet(key string, field string) (string, error) {
 	return ins.Client.HGet(key, field).Result()
+}
+
+func (ins *connector) TTL(key string) (time.Duration, error) {
+	return ins.Client.TTL(key).Result()
 }

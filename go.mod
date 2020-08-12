@@ -4,8 +4,11 @@ go 1.13
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/fsnotify/fsnotify v1.4.7
+	github.com/fsnotify/fsnotify v1.4.9
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v7 v7.2.0
+	github.com/go-redsync/redsync v1.4.2 // indirect
+	github.com/go-redsync/redsync/v3 v3.0.0
 	github.com/gofrs/uuid v3.3.0+incompatible // indirect
 	github.com/googollee/go-socket.io v1.4.3 // indirect
 	github.com/gorilla/mux v1.7.4 // indirect
@@ -27,7 +30,5 @@ require (
 	github.com/vektra/mockery v0.0.0-20181123154057-e78b021dcbb5 // indirect
 	go.mongodb.org/mongo-driver v1.3.1
 	golang.org/x/crypto v0.0.0-20200221231518-2aa609cf4a9d
-	golang.org/x/sys v0.0.0-20200331124033-c3d80250170d // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
-	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
