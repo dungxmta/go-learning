@@ -9,6 +9,14 @@ import (
 	"time"
 )
 
+//
+// refs
+//  https://redis.io/topics/distlock
+//  https://github.com/go-redsync/redsync/blob/master/examples/goredis/main.go
+//  https://github.com/bsm/redislock
+//  https://github.com/cikupin/redis-mutex-lock/blob/master/redislock/drivers/redis.go
+//
+
 func init() {
 	_, err := redis.GetInstance().Init("127.0.0.1:6379", "", 1)
 	if err != nil {
