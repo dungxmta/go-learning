@@ -45,7 +45,9 @@ func KeyWithSalt(secretKey, salt []byte) ([]byte, []byte, error) {
 	}
 
 	// r * p < 2^30
-	key, err := scrypt.Key(secretKey, salt, 32768, 8, 1, keyLen)
+	key, err := scrypt.Key(secretKey, salt, 32768, 8, 1, keyLen) // 2^15 -> 1,25s | 10 input
+	// key, err := scrypt.Key(secretKey, salt, 16384, 8, 1, keyLen) // 2^14 -> 0,55s
+	// key, err := scrypt.Key(secretKey, salt, 8192, 8, 1, keyLen) // 2^13 -> 0,29s
 	if err != nil {
 		return nil, nil, err
 	}
