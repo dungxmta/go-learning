@@ -117,13 +117,13 @@ func (s *Server) HandleNewClient(clientConn *net.Conn) {
 	}
 
 	// clear client if disconnected
-	leaveMsg := fmt.Sprintf("[+] Client has leave this room: %v\n", clientId)
+	leaveMsg := fmt.Sprintf("[+] Client has left this room: %v\n", clientId)
 	s.Room[roomName].Publish(clientId, leaveMsg)
 
 	s.Room[roomName].rmClient(clientId)
 	s.rmClient(clientId)
 
-	log.Printf("[+] Client %v has leave room %v!!!\n", clientId, roomName)
+	log.Printf("[+] Client %v has left room %v!!!\n", clientId, roomName)
 }
 
 func (s *Server) rmClient(id string) {
