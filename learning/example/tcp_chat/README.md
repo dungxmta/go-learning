@@ -14,6 +14,7 @@
 ## TODO
 
 - Handle disconnect from client/server side
+- Support command: quit, join_room, ...
 - ...
 
 ## Demo

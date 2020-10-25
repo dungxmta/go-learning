@@ -48,17 +48,21 @@ func NewServer(proto, addr string) *Server {
 func (s *Server) Listen() {
 	log.Println("[+] Listening...")
 	for {
+		log.Println("[debug] before accept")
 		client, err := s.Listener.Accept()
 		if err != nil {
 			log.Println("Error when accept new client", err)
 			continue
 		}
+		log.Println("[debug] after accept")
 
 		go s.HandleNewClient(&client)
 	}
 }
 
 func (s *Server) HandleNewClient(clientConn *net.Conn) {
+	log.Println("[debug] start handle new client")
+
 	// read client info for the first time
 	reader := bufio.NewReader(*clientConn)
 	info, err := reader.ReadString('\n')
@@ -140,8 +144,8 @@ func (s *Server) rmClient(id string) {
 func extractClientInfo(s string) (clientId, room string) {
 	lst := strings.SplitN(s, ":", 2)
 	clientId, room = lst[0], lst[1]
-	room = room[:len(room)-1]
-	log.Println("[debug] client: ", clientId)
-	log.Println("[debug] room: ", room)
+	room = room[:len(room)-1] // strip \n
+	log.Println("[debug] client:", clientId)
+	log.Println("[debug] room:", room)
 	return
 }
