@@ -20,6 +20,8 @@ type MsgQueue interface {
 
 	LPush(string, ...interface{}) (int64, error)
 	RPop(string) (string, error)
+	SAdd(key string, values ...interface{}) (int64, error)
+	SPop(key string) (string, error)
 	HGet(string, string) (string, error)
 
 	TTL(key string) (time.Duration, error)

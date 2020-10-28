@@ -49,6 +49,14 @@ func (ins *connector) RPop(key string) (string, error) {
 	return ins.Client.RPop(key).Result()
 }
 
+func (ins *connector) SAdd(key string, values ...interface{}) (int64, error) {
+	return ins.Client.SAdd(key, values).Result()
+}
+
+func (ins *connector) SPop(key string) (string, error) {
+	return ins.Client.SPop(key).Result()
+}
+
 func (ins *connector) HGet(key string, field string) (string, error) {
 	return ins.Client.HGet(key, field).Result()
 }
