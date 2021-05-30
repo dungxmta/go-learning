@@ -104,12 +104,15 @@ func filter(row []string, loopCh chan<- Row) {
 		}
 	}
 
-	// log.Println("...")
+	// verify data
 	if gr == "0" {
 		gr = ""
 	}
 	if owner == "0" {
 		owner = ""
+	}
+	if typ != "ip" && gr == "" && owner == "" {
+		return
 	}
 
 	loopCh <- Row{
