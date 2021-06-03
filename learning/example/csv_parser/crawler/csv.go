@@ -23,7 +23,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	go WriteCSV("raw.csv", loopCh, doneCh)
+	go WriteCSV("./raw.csv", loopCh, doneCh)
 
 	maxReq := calcTotalRequest(2021, 06, 1, 365, 600)
 	log.Println("Max req:", maxReq)
