@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"os"
 	"path"
+	"testProject/learning/example/csv_parser/model"
 )
 
 type Producer struct{}
@@ -12,7 +13,7 @@ func NewProducer() *Producer {
 	return &Producer{}
 }
 
-func (p *Producer) writeCSV(dict *map[string]Row) {
+func (p *Producer) writeCSV(dict *map[string]model.Row) {
 	outPath := path.Join(outDir, "data.csv")
 	fo, err := os.Create(outPath)
 	if err != nil {

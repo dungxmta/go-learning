@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"testProject/learning/example/csv_parser/model"
 )
 
 type void struct{}
@@ -13,13 +14,6 @@ type void struct{}
 // func NewDict() *map[string]Row {
 // 	return &map[string]Row{}
 // }
-
-type Row struct {
-	Type  string // ip / cid / sid
-	Value string
-	Group string
-	Owner string
-}
 
 /*
 {
@@ -30,29 +24,26 @@ type Row struct {
 }
 */
 
-func startWkPool(maxWk int, files []string, loopCh chan<- Row) *sync.WaitGroup {
+func startWkPool(maxWk int, files []string, loopCh chan<- model.Row, wg *sync.WaitGroup) {
 	poolCh := make(chan void, maxWk)
 
-	var wg sync.WaitGroup
+	wg.Add(len(files))
 
 	for _, file := range files {
 		poolCh <- void{} // 1 slot / 1 worker
-		wg.Add(1)
 
-		go func(filePath string, poolCh <-chan void, loopCh chan<- Row, wg *sync.WaitGroup) {
+		go func(filePath string, poolCh <-chan void, loopCh chan<- model.Row, wg *sync.WaitGroup) {
 			log.Printf("start read %v...", filePath)
 			defer log.Printf("%v done", filePath)
 
 			worker(filePath, loopCh)
 			<-poolCh // free slot after done
 			wg.Done()
-		}(file, poolCh, loopCh, &wg)
+		}(file, poolCh, loopCh, wg)
 	}
-
-	return &wg
 }
 
-func worker(filePath string, loopCh chan<- Row) {
+func worker(filePath string, loopCh chan<- model.Row) {
 	fi, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
@@ -75,7 +66,7 @@ func worker(filePath string, loopCh chan<- Row) {
 
 }
 
-func filter(row []string, loopCh chan<- Row) {
+func filter(row []string, loopCh chan<- model.Row) {
 
 	var (
 		typ   = "ip"
@@ -115,7 +106,7 @@ func filter(row []string, loopCh chan<- Row) {
 		return
 	}
 
-	loopCh <- Row{
+	loopCh <- model.Row{
 		Type:  typ,
 		Value: row[2],
 		Group: gr,

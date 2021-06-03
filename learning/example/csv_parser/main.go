@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"sync"
+	"testProject/learning/example/csv_parser/model"
 )
 
 const (
@@ -26,12 +28,14 @@ func main() {
 		return
 	}
 
-	loopCh := make(chan Row, 100)
+	loopCh := make(chan model.Row, 100)
 	doneCh := make(chan void)
-	dict := &map[string]Row{}
+	dict := &map[string]model.Row{}
 
-	wg := startWkPool(maxWk, files, loopCh)
+	var wg sync.WaitGroup
+
 	go normalizer(dict, loopCh, doneCh)
+	go startWkPool(maxWk, files, loopCh, &wg)
 
 	wg.Wait()
 	close(loopCh)
@@ -42,27 +46,34 @@ func main() {
 	pr.writeCSV(dict)
 }
 
-func normalizer(dict *map[string]Row, loopCh <-chan Row, doneCh chan<- void) {
+func normalizer(dict *map[string]model.Row, loopCh <-chan model.Row, doneCh chan<- void) {
 	defer close(doneCh)
 
 	// var (
 	// 	val, gr, owner, typ string
 	// )
 	var (
-		added bool
-		old   Row
+		added     bool
+		old       model.Row
+		rowChange bool
 	)
 
 	for row := range loopCh {
 		// log.Println(row)
+		rowChange = false
 
 		if old, added = (*dict)[row.Value]; added {
-			// only update if not ok
 			if old.Owner == "" && row.Owner != "" {
 				old.Owner = row.Owner
+				rowChange = true
 			}
 			if old.Group == "" && row.Group != "" {
 				old.Group = row.Group
+				rowChange = true
+			}
+
+			if rowChange {
+				(*dict)[row.Value] = old
 			}
 			continue
 		}
