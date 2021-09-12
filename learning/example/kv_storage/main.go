@@ -83,6 +83,17 @@ func main() {
 	}
 	cmdDBViewer.Flags().StringVarP(&dbPath, "db_path", "d", "data_storage/badger", "DB path")
 
+	// command test map
+	var cmdTestMap = &cobra.Command{
+		Use:   "test_map",
+		Short: "Use Map to store data & check memory usage",
+		Args:  cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			lstCmd.TestMapCheckMem(logger, inpPath)
+		},
+	}
+	cmdTestMap.Flags().StringVarP(&inpPath, "inp_path", "i", "input_raw/list_ips_5.txt", "Input file path")
+
 	// command run
 	var cmdRun = &cobra.Command{
 		Use:   "run",
@@ -100,6 +111,7 @@ func main() {
 		cmdGenInput,
 		cmdSaveDB,
 		cmdDBViewer,
+		cmdTestMap,
 	)
 
 	rootCmd.Execute()

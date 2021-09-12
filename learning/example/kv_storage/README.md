@@ -79,10 +79,14 @@ Benchmark
 - Using BadgerDB
   + Import 5m ips to DB took 130s (check exists before adding)
   + CPU ~50-90 %
-  + Memory ~190-350 MBs
+  + Memory ~190-350 M
+  + Try `./kv_storage save_db -i=input_raw/list_ips_1m.txt -c=true -m=true`
 
-- Try `./kv_storage save_db -i=input_raw/list_ips_1m.txt -c=true -m=true`
-
+- Using Map in go
+  + Memory:
+    - 70->270 M (input file 1m ips with size 14M)
+    - 70->800 M (input file 5m ips with size 70M)
+  + Try `./kv_storage test_map -i=input_raw/list_ips_1m.txt`
 
 Refs
 ---
