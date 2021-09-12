@@ -3,6 +3,7 @@ module testProject
 go 1.15
 
 require (
+	github.com/Shopify/sarama v1.29.1
 	github.com/coreos/bbolt v1.3.2 // indirect
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // indirect
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
@@ -44,7 +45,7 @@ require (
 	go.etcd.io/bbolt v1.3.2 // indirect
 	go.mongodb.org/mongo-driver v1.3.1
 	go.uber.org/zap v1.17.0
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/resty.v1 v1.12.0 // indirect
 )
