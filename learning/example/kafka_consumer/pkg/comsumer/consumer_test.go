@@ -8,8 +8,6 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	"github.com/stretchr/testify/assert"
-
 	"testProject/learning/example/kafka_consumer/pkg/model"
 )
 
@@ -49,13 +47,30 @@ func testProduce(topic string, limit int) <-chan struct{} {
 	return produceDone
 }
 
-func TestMultiBatchConsumer(t *testing.T) {
+func TestProducer(t *testing.T) {
 	limit := 500000
-	// limit = 100000
+	// limit = 2000000
+	// limit = 1000000
+	limit = 1000
 
 	topic := testTopicPrefix + fmt.Sprintf("%d", time.Now().Unix())
+	topic = "test_topic"
 
 	produceDone := testProduce(topic, limit)
+	<-produceDone
+	time.Sleep(5 * time.Second)
+}
+
+func TestMultiBatchConsumer(t *testing.T) {
+	limit := 500000
+	limit = 2000000
+	limit = 100000
+	t.Log(limit)
+
+	topic := testTopicPrefix + fmt.Sprintf("%d", time.Now().Unix())
+	topic = "test_topic"
+
+	// produceDone := testProduce(topic, limit)
 
 	// var count int64
 	// var start = time.Now()
@@ -67,15 +82,16 @@ func TestMultiBatchConsumer(t *testing.T) {
 		for r := range resChan {
 			consumeMsgMap[r] = struct{}{}
 			count += 1
-			if count%1000 == 0 {
-				log.Println(">> ", count)
+			if count%10 == 0 {
+				log.Println(">> ", count, r)
 			}
 		}
 	}()
 
 	var bufChan = make(chan batchMessages, 1000)
-	for i := 0; i < 8; i++ {
-		go func() {
+	for i := 0; i < 3; i++ {
+		go func(i int) {
+			var count int
 			for messages := range bufChan {
 				for j := range messages {
 					var msg model.Message
@@ -89,26 +105,36 @@ func TestMultiBatchConsumer(t *testing.T) {
 					// if cur%1000 == 0 {
 					// 	fmt.Printf("multi batch consumer consumed %d messages at speed %.2f/s\n", cur, float64(cur)/time.Since(start).Seconds())
 					// }
+					time.Sleep(time.Millisecond * 500)
+					log.Println(i, "id=", msg.Id)
+					count++
+					if count >= 10 {
+						log.Println(i, "10+")
+						return
+					}
 				}
 			}
-		}()
+		}(i)
 	}
 	handler := NewMultiBatchConsumerGroupHandler(&MultiBatchConsumerConfig{
-		MaxBufSize:            1000,
+		MaxBufSize:            10,
 		BufChan:               bufChan,
 		TickerIntervalSeconds: 1,
 	})
-	consumer, err := NewConsumerGroup(testBroker, []string{topic}, "multi-batch-consumer-"+fmt.Sprintf("%d", time.Now().Unix()), handler)
+
+	groupId := "multi-batch-consumer-" + fmt.Sprintf("%d", time.Now().Unix())
+	groupId = "test_group"
+	consumer, err := NewConsumerGroup(testBroker, []string{topic}, groupId, handler)
 	if err != nil {
 		return
 	}
 	defer consumer.Close()
 
-	<-produceDone
+	// <-produceDone
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(60 * time.Second)
 
-	assert.Equal(t, limit, len(consumeMsgMap))
+	// assert.Equal(t, limit, len(consumeMsgMap))
 }
 
 // func TestSyncConsumer(t *testing.T)  {
